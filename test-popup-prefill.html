@@ -1,0 +1,107 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Test Popup Pre-fill</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+            line-height: 1.6;
+        }
+        .question {
+            background: #f5f5f5;
+            padding: 15px;
+            margin: 20px 0;
+            border-radius: 8px;
+            border-left: 4px solid #2563eb;
+        }
+        .instructions {
+            background: #e3f2fd;
+            padding: 15px;
+            border-radius: 8px;
+            margin-bottom: 20px;
+        }
+    </style>
+</head>
+<body>
+    <h1>AI MCQ Solver Extension Test Page</h1>
+    
+    <div class="instructions">
+        <h3>🧪 Testing Instructions:</h3>
+        <ol>
+            <li><strong>Double-click</strong> on any question text below</li>
+            <li>Click <strong>"Solve with AI MCQ Solver"</strong> in the context menu</li>
+            <li>The popup should open with the selected text pre-filled</li>
+            <li>Click <strong>"Solve"</strong> to test the new AI formatting</li>
+            <li><strong>Expected Format:</strong> "Option (a): [answer]" followed by "Reason: [explanation]"</li>
+        </ol>
+    </div>
+
+    <div class="question">
+        <h3>Question 1: Programming Fundamentals</h3>
+        <p>Which of the following is NOT a valid data type in JavaScript?</p>
+        <p>a) string</p>
+        <p>b) number</p>
+        <p>c) boolean</p>
+        <p>d) float</p>
+    </div>
+
+    <div class="question">
+        <h3>Question 2: Computer Science</h3>
+        <p>What is the time complexity of binary search?</p>
+        <p>a) O(n)</p>
+        <p>b) O(log n)</p>
+        <p>c) O(n²)</p>
+        <p>d) O(1)</p>
+    </div>
+
+    <div class="question">
+        <h3>Question 3: Web Development</h3>
+        <p>Which HTML tag is used to create a hyperlink?</p>
+        <p>a) &lt;link&gt;</p>
+        <p>b) &lt;a&gt;</p>
+        <p>c) &lt;href&gt;</p>
+        <p>d) &lt;url&gt;</p>
+    </div>
+
+    <div class="question">
+        <h3>Question 4: Database Management</h3>
+        <p>What does SQL stand for?</p>
+        <p>a) Structured Query Language</p>
+        <p>b) Standard Query Language</p>
+        <p>c) Simple Query Language</p>
+        <p>d) System Query Language</p>
+    </div>
+
+    <div class="question">
+        <h3>Question 5: Operating Systems</h3>
+        <p>Which scheduling algorithm provides the shortest average waiting time?</p>
+        <p>a) First-Come, First-Served (FCFS)</p>
+        <p>b) Shortest Job First (SJF)</p>
+        <p>c) Round Robin</p>
+        <p>d) Priority Scheduling</p>
+    </div>
+
+    <script>
+        // Add some visual feedback for text selection
+        document.addEventListener('mouseup', () => {
+            const selection = window.getSelection();
+            if (selection && selection.toString().trim()) {
+                console.log('Text selected:', selection.toString().trim());
+            }
+        });
+
+        // Add double-click feedback
+        document.addEventListener('dblclick', () => {
+            const selection = window.getSelection();
+            if (selection && selection.toString().trim()) {
+                console.log('Double-clicked text:', selection.toString().trim());
+            }
+        });
+    </script>
+</body>
+</html>
