@@ -1,6 +1,6 @@
 import React from 'react'
-import { Brain, Moon, Sun } from 'lucide-react'
-import { Switch } from './ui/switch'
+import { Brain } from 'lucide-react'
+import { ThemeToggle } from './ui/theme-toggle'
 
 interface HeaderProps {
   isDarkMode: boolean
@@ -20,14 +20,11 @@ export const Header: React.FC<HeaderProps> = ({ isDarkMode, onToggleDarkMode }) 
         </div>
       </div>
       
-      <div className="flex items-center space-x-2">
-        <Sun className="h-4 w-4 text-muted-foreground" />
-        <Switch
-          checked={isDarkMode}
-          onCheckedChange={onToggleDarkMode}
-          className="data-[state=checked]:bg-primary"
+      <div className="flex items-center">
+        <ThemeToggle
+          isDarkMode={isDarkMode}
+          onToggle={onToggleDarkMode}
         />
-        <Moon className="h-4 w-4 text-muted-foreground" />
       </div>
     </div>
   )
