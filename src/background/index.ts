@@ -3,6 +3,14 @@
 if (typeof chrome !== 'undefined' && chrome.runtime) {
   chrome.runtime.onInstalled.addListener(() => {
     console.log('AI MCQ Solver extension installed');
+    
+    // Create context menu
+    chrome.contextMenus.create({
+      id: 'ask-quizai',
+      title: 'Ask QuizAi',
+      contexts: ['selection'],
+      documentUrlPatterns: ['<all_urls>']
+    });
   });
 
   // Handle messages between content script and popup
@@ -114,6 +122,37 @@ if (typeof chrome !== 'undefined' && chrome.runtime) {
   chrome.storage.onChanged.addListener((changes: { [key: string]: chrome.storage.StorageChange }, namespace: string) => {
     if (namespace === 'local' && changes.theme) {
       console.log('Theme changed to:', changes.theme.newValue);
+    }
+  });
+
+  // Handle context menu clicks
+  chrome.contextMenus.onClicked.addListener((info, tab) => {
+    if (info.menuItemId === 'ask-quizai' && info.selectionText) {
+      console.log('🖱️ Context menu clicked for text:', info.selectionText);
+      
+      // Store the selected text and open popup
+      chrome.storage.local.set({
+        selectedText: info.selectionText,
+        selectedUrl: tab?.url,
+        timestamp: Date.now()
+      }).then(() => {
+        console.log('✅ Selected text stored for popup:', info.selectionText?.substring(0, 50) + '...');
+        
+        // Open the popup
+        chrome.action.openPopup().catch((error) => {
+          console.log('❌ Could not open popup automatically:', error);
+          // Fallback: send message to popup if it's already open
+          chrome.runtime.sendMessage({
+            action: 'selectedText',
+            text: info.selectionText,
+            url: tab?.url
+          }).catch(() => {
+            console.log('❌ Popup not available for message');
+          });
+        });
+      }).catch((error) => {
+        console.error('❌ Error storing selected text for popup:', error);
+      });
     }
   });
 
