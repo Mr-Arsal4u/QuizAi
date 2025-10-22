@@ -92,8 +92,9 @@ async function testIndividualProviders() {
         results.push({ provider: provider.name, success: false, error: 'No response' });
       }
     } catch (error) {
-      console.warn(`❌ ${provider.name} failed:`, error.message);
-      results.push({ provider: provider.name, success: false, error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.warn(`❌ ${provider.name} failed:`, errorMessage);
+      results.push({ provider: provider.name, success: false, error: errorMessage });
     }
     console.log(''); // Add spacing between tests
   }
@@ -102,7 +103,7 @@ async function testIndividualProviders() {
   console.log('📊 Individual API Test Summary:');
   console.log('='.repeat(50));
   results.forEach(({ provider, success, result, error }) => {
-    if (success) {
+    if (success && result) {
       console.log(`✅ ${provider}: ${result.timeTaken}ms - "${result.answer}"`);
     } else {
       console.log(`❌ ${provider}: ${error}`);
@@ -154,8 +155,9 @@ async function testAllAPIsComparison() {
         responses.push({ provider: provider.name, result: null });
       }
     } catch (error) {
-      console.log(`❌ ${provider.name}: ${error.message}`);
-      responses.push({ provider: provider.name, result: null, error: error.message });
+      const errorMessage = error instanceof Error ? error.message : String(error);
+      console.log(`❌ ${provider.name}: ${errorMessage}`);
+      responses.push({ provider: provider.name, result: null, error: errorMessage });
     }
   }
   
