@@ -3,6 +3,10 @@
  * Chrome Extension: AI MCQ Solver
  */
 
+// Load environment variables from .env file
+import { config } from 'dotenv';
+config();
+
 import { solveWithFallback, getAPIStatus } from '../lib/api.js';
 
 /**
@@ -56,30 +60,117 @@ async function testIndividualProviders() {
   console.log('🔍 Testing individual providers...');
   
   const testQuestion = "What is the capital of France?";
+  
+  // Import the individual functions directly
+  const { tryGroq, tryFreeLLM, tryOpenRouter, tryGemini, tryHuggingFace, tryOpenAI } = await import('../lib/api.js');
+  
   const providers = [
-    'Groq',
-    'FreeLLM', 
-    'OpenRouter',
-    'Gemini',
-    'HuggingFace',
-    'OpenAI'
+    { name: 'Groq', fn: tryGroq },
+    { name: 'FreeLLM', fn: tryFreeLLM },
+    { name: 'OpenRouter', fn: tryOpenRouter },
+    { name: 'Gemini', fn: tryGemini },
+    { name: 'HuggingFace', fn: tryHuggingFace },
+    { name: 'OpenAI', fn: tryOpenAI }
   ];
+  
+  const results = [];
   
   for (const provider of providers) {
     try {
-      console.log(`🧪 Testing ${provider}...`);
-      const result = await solveWithFallback(testQuestion);
+      console.log(`🧪 Testing ${provider.name}...`);
+      const result = await provider.fn(testQuestion);
       
-      if (result.source === provider) {
-        console.log(`✅ ${provider} responded successfully`);
+      if (result) {
+        console.log(`✅ ${provider.name} responded successfully`);
         console.log(`   Answer: ${result.answer}`);
+        console.log(`   Explanation: ${result.explanation}`);
         console.log(`   Time: ${result.timeTaken}ms`);
-        break; // Stop after first successful provider
+        console.log(`   Source: ${result.source}`);
+        results.push({ provider: provider.name, success: true, result });
+      } else {
+        console.log(`❌ ${provider.name} returned null (no response)`);
+        results.push({ provider: provider.name, success: false, error: 'No response' });
       }
     } catch (error) {
-      console.warn(`❌ ${provider} failed:`, error);
+      console.warn(`❌ ${provider.name} failed:`, error.message);
+      results.push({ provider: provider.name, success: false, error: error.message });
+    }
+    console.log(''); // Add spacing between tests
+  }
+  
+  // Summary
+  console.log('📊 Individual API Test Summary:');
+  console.log('='.repeat(50));
+  results.forEach(({ provider, success, result, error }) => {
+    if (success) {
+      console.log(`✅ ${provider}: ${result.timeTaken}ms - "${result.answer}"`);
+    } else {
+      console.log(`❌ ${provider}: ${error}`);
+    }
+  });
+  
+  const successCount = results.filter(r => r.success).length;
+  console.log(`\n🎯 Success Rate: ${successCount}/${results.length} (${((successCount/results.length)*100).toFixed(1)}%)`);
+  
+  return results;
+}
+
+/**
+ * Test all APIs with the same question to compare responses
+ */
+async function testAllAPIsComparison() {
+  console.log('🔄 Testing all APIs with same question for comparison...');
+  
+  const testQuestion = "What is 2+2?";
+  const { tryGroq, tryFreeLLM, tryOpenRouter, tryGemini, tryHuggingFace, tryOpenAI } = await import('../lib/api.js');
+  
+  const providers = [
+    { name: 'Groq', fn: tryGroq },
+    { name: 'FreeLLM', fn: tryFreeLLM },
+    { name: 'OpenRouter', fn: tryOpenRouter },
+    { name: 'Gemini', fn: tryGemini },
+    { name: 'HuggingFace', fn: tryHuggingFace },
+    { name: 'OpenAI', fn: tryOpenAI }
+  ];
+  
+  console.log(`📝 Question: "${testQuestion}"`);
+  console.log('='.repeat(60));
+  
+  const responses = [];
+  
+  for (const provider of providers) {
+    try {
+      console.log(`\n🧪 Testing ${provider.name}...`);
+      const result = await provider.fn(testQuestion);
+      
+      if (result) {
+        console.log(`✅ ${provider.name} Response:`);
+        console.log(`   Answer: "${result.answer}"`);
+        console.log(`   Explanation: "${result.explanation}"`);
+        console.log(`   Time: ${result.timeTaken}ms`);
+        responses.push({ provider: provider.name, result });
+      } else {
+        console.log(`❌ ${provider.name}: No response`);
+        responses.push({ provider: provider.name, result: null });
+      }
+    } catch (error) {
+      console.log(`❌ ${provider.name}: ${error.message}`);
+      responses.push({ provider: provider.name, result: null, error: error.message });
     }
   }
+  
+  // Summary comparison
+  console.log('\n📊 Response Comparison Summary:');
+  console.log('='.repeat(60));
+  responses.forEach(({ provider, result, error }) => {
+    if (result) {
+      console.log(`${provider}: "${result.answer}" (${result.timeTaken}ms)`);
+    } else {
+      console.log(`${provider}: Failed - ${error || 'No response'}`);
+    }
+  });
+  
+  return responses;
 }
 
 /**
@@ -125,14 +216,41 @@ async function performanceTest() {
 export {
   testAIClients,
   testIndividualProviders,
+  testAllAPIsComparison,
   performanceTest
 };
 
-// Run test if this file is executed directly
+// Run comprehensive test if this file is executed directly
 if (typeof window === 'undefined') {
   // Node.js environment
-  testAIClients()
-    .then(() => console.log('🎉 All tests completed!'))
+  async function runComprehensiveTest() {
+    console.log('🚀 Running comprehensive AI API test...\n');
+    
+    // Test the main fallback system
+    await testAIClients();
+    
+    console.log('\n' + '='.repeat(50));
+    console.log('🔍 Testing individual providers...\n');
+    
+    // Test individual providers
+    await testIndividualProviders();
+    
+    console.log('\n' + '='.repeat(50));
+    console.log('🔄 Testing all APIs with same question for comparison...\n');
+    
+    // Test all APIs with same question
+    await testAllAPIsComparison();
+    
+    console.log('\n' + '='.repeat(50));
+    console.log('⚡ Running performance test...\n');
+    
+    // Performance test
+    await performanceTest();
+    
+    console.log('\n🎉 All comprehensive tests completed!');
+  }
+  
+  runComprehensiveTest()
     .catch(error => console.error('💥 Tests failed:', error));
 } else {
   // Browser environment - make functions available globally

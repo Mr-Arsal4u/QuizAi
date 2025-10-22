@@ -4,6 +4,10 @@
  * Supports 6 AI providers with automatic fallback
  */
 
+// Load environment variables
+import { config } from 'dotenv';
+config();
+
 // Response interfaces
 export interface AIResponse {
   answer: string;
@@ -67,7 +71,7 @@ async function tryGroq(question: string): Promise<AIResponse | null> {
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
-        model: 'mixtral-8x7b-32768',
+        model: 'llama-3.1-8b-instant',
         messages: [
           { role: 'system', content: 'You are a helpful AI assistant. Provide clear, concise answers.' },
           { role: 'user', content: question }
@@ -202,7 +206,7 @@ async function tryGemini(question: string): Promise<AIResponse | null> {
   const startTime = Date.now();
   
   try {
-    const response = await withTimeout(fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash-latest:generateContent?key=${API_KEYS.GEMINI}`, {
+    const response = await withTimeout(fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${API_KEYS.GEMINI}`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json'
@@ -391,3 +395,6 @@ export function getAPIStatus() {
     OpenAI: { available: !!API_KEYS.OPENAI, requiresKey: true }
   };
 }
+
+// Export individual API functions for testing
+export { tryGroq, tryFreeLLM, tryOpenRouter, tryGemini, tryHuggingFace, tryOpenAI };
