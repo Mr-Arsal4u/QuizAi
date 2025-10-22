@@ -170,7 +170,7 @@ async function tryOpenRouter(question: string): Promise<AIResponse | null> {
         'X-Title': 'QuizAI Extension'
       },
       body: JSON.stringify({
-        model: 'mistralai/mixtral-8x7b-instruct',
+        model: 'meta-llama/llama-3.2-3b-instruct:free',
         messages: [
           { role: 'system', content: 'You are a helpful AI assistant. Provide clear, concise answers.' },
           { role: 'user', content: question }
