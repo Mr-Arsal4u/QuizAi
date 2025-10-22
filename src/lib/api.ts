@@ -4,10 +4,6 @@
  * Supports 6 AI providers with automatic fallback
  */
 
-// Load environment variables
-import { config } from 'dotenv';
-config();
-
 // Response interfaces
 export interface AIResponse {
   answer: string;
