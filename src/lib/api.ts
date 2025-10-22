@@ -69,10 +69,10 @@ async function tryGroq(question: string): Promise<AIResponse | null> {
       body: JSON.stringify({
         model: 'llama-3.1-8b-instant',
         messages: [
-          { role: 'system', content: 'You are a helpful AI assistant. Provide clear, concise answers.' },
+          { role: 'system', content: 'You are a quiz assistant. Give ONLY the answer in this exact format: "A) <Answer> detail: <one-line reason>" for MCQs or "The Answer to question is **<Answer>**" for direct questions. NO extra text, NO explanations, NO analysis. Just the answer.' },
           { role: 'user', content: question }
         ],
-        max_tokens: 500,
+        max_tokens: 50,
         temperature: 0.7
       })
     }), 10000);
@@ -85,8 +85,8 @@ async function tryGroq(question: string): Promise<AIResponse | null> {
     if (!content) throw new Error('No content in response');
     
     return {
-      answer: content.split('\n')[0] || content,
-      explanation: content.split('\n').slice(1).join(' ').trim() || 'No additional explanation provided.',
+      answer: content.trim(),
+      explanation: 'Brief explanation provided.',
       source: 'Groq',
       timeTaken: Date.now() - startTime
     };
@@ -168,10 +168,10 @@ async function tryOpenRouter(question: string): Promise<AIResponse | null> {
       body: JSON.stringify({
         model: 'meta-llama/llama-3.2-3b-instruct:free',
         messages: [
-          { role: 'system', content: 'You are a helpful AI assistant. Provide clear, concise answers.' },
+          { role: 'system', content: 'You are a quiz assistant. Give ONLY the answer in this exact format: "A) <Answer> detail: <one-line reason>" for MCQs or "The Answer to question is **<Answer>**" for direct questions. NO extra text, NO explanations, NO analysis. Just the answer.' },
           { role: 'user', content: question }
         ],
-        max_tokens: 500,
+        max_tokens: 50,
         temperature: 0.7
       })
     }), 10000);
@@ -184,8 +184,8 @@ async function tryOpenRouter(question: string): Promise<AIResponse | null> {
     if (!content) throw new Error('No content in response');
     
     return {
-      answer: content.split('\n')[0] || content,
-      explanation: content.split('\n').slice(1).join(' ').trim() || 'No additional explanation provided.',
+      answer: content.trim(),
+      explanation: 'Brief explanation provided.',
       source: 'OpenRouter',
       timeTaken: Date.now() - startTime
     };
@@ -228,8 +228,8 @@ async function tryGemini(question: string): Promise<AIResponse | null> {
     if (!content) throw new Error('No content in response');
     
     return {
-      answer: content.split('\n')[0] || content,
-      explanation: content.split('\n').slice(1).join(' ').trim() || 'No additional explanation provided.',
+      answer: content.trim(),
+      explanation: 'Brief explanation provided.',
       source: 'Gemini',
       timeTaken: Date.now() - startTime
     };
@@ -270,8 +270,8 @@ async function tryHuggingFace(question: string): Promise<AIResponse | null> {
     if (!content) throw new Error('No content in response');
     
     return {
-      answer: content.split('\n')[0] || content,
-      explanation: content.split('\n').slice(1).join(' ').trim() || 'No additional explanation provided.',
+      answer: content.trim(),
+      explanation: 'Brief explanation provided.',
       source: 'HuggingFace',
       timeTaken: Date.now() - startTime
     };
@@ -297,10 +297,10 @@ async function tryOpenAI(question: string): Promise<AIResponse | null> {
       body: JSON.stringify({
         model: 'gpt-4o-mini',
         messages: [
-          { role: 'system', content: 'You are a helpful AI assistant. Provide clear, concise answers.' },
+          { role: 'system', content: 'You are a quiz assistant. Give ONLY the answer in this exact format: "A) <Answer> detail: <one-line reason>" for MCQs or "The Answer to question is **<Answer>**" for direct questions. NO extra text, NO explanations, NO analysis. Just the answer.' },
           { role: 'user', content: question }
         ],
-        max_tokens: 500,
+        max_tokens: 50,
         temperature: 0.7
       })
     }), 10000);
@@ -313,8 +313,8 @@ async function tryOpenAI(question: string): Promise<AIResponse | null> {
     if (!content) throw new Error('No content in response');
     
     return {
-      answer: content.split('\n')[0] || content,
-      explanation: content.split('\n').slice(1).join(' ').trim() || 'No additional explanation provided.',
+      answer: content.trim(),
+      explanation: 'Brief explanation provided.',
       source: 'OpenAI',
       timeTaken: Date.now() - startTime
     };
