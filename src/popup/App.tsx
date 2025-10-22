@@ -5,13 +5,13 @@ import { AnswerBox } from '../components/AnswerBox'
 import { Button } from '../components/ui/button'
 import { Textarea } from '../components/ui/textarea'
 import { Card, CardContent } from '../components/ui/card'
-import { solveQuestion, SolveResponse } from '../lib/api'
+import { solveWithFallback, AIResponse } from '../lib/api'
 import { Send, Copy, Check } from 'lucide-react'
 
 const App: React.FC = () => {
   const [question, setQuestion] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [response, setResponse] = useState<SolveResponse | null>(null)
+  const [response, setResponse] = useState<AIResponse | null>(null)
   const [isDarkMode, setIsDarkMode] = useState(false)
   const [copied, setCopied] = useState(false)
   const [contextInvalidated, setContextInvalidated] = useState(false)
@@ -161,14 +161,15 @@ const App: React.FC = () => {
     setResponse(null)
 
     try {
-      const result = await solveQuestion(question)
+      const result = await solveWithFallback(question)
       setResponse(result)
     } catch (error) {
       console.error('Error solving question:', error)
       setResponse({
         answer: 'Sorry, there was an error processing your question. Please try again.',
         explanation: 'The AI service is currently unavailable. Please check your connection and try again.',
-        confidence: 0
+        source: 'error',
+        timeTaken: 0
       })
     } finally {
       setIsLoading(false)

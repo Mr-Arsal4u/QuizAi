@@ -1,10 +1,10 @@
 import React from 'react'
 import { Card, CardContent, CardHeader, CardTitle } from './ui/card'
 import { CheckCircle, Info, TrendingUp } from 'lucide-react'
-import { SolveResponse } from '@/lib/api'
+import { AIResponse } from '@/lib/api'
 
 interface AnswerBoxProps {
-  response: SolveResponse
+  response: AIResponse
   isLoading?: boolean
 }
 
@@ -29,8 +29,13 @@ export const AnswerBox: React.FC<AnswerBoxProps> = ({ response, isLoading = fals
     )
   }
 
-  const confidenceColor = response.confidence > 0.8 ? 'text-green-600' : 
-                         response.confidence > 0.6 ? 'text-yellow-600' : 'text-red-600'
+  // Calculate confidence based on source and response time
+  const confidence = response.source === 'none' || response.source === 'error' ? 0 :
+                    response.timeTaken < 2000 ? 0.9 : 
+                    response.timeTaken < 5000 ? 0.8 : 0.7;
+  
+  const confidenceColor = confidence > 0.8 ? 'text-green-600' : 
+                         confidence > 0.6 ? 'text-yellow-600' : 'text-red-600'
 
   return (
     <Card className="animate-fade-in">
@@ -73,11 +78,11 @@ export const AnswerBox: React.FC<AnswerBoxProps> = ({ response, isLoading = fals
             <div className="w-16 h-2 bg-muted rounded-full overflow-hidden">
               <div 
                 className={`h-full bg-primary transition-all duration-500`}
-                style={{ width: `${response.confidence * 100}%` }}
+                style={{ width: `${confidence * 100}%` }}
               />
             </div>
             <span className={`text-xs font-medium ${confidenceColor}`}>
-              {Math.round(response.confidence * 100)}%
+              {Math.round(confidence * 100)}%
             </span>
           </div>
         </div>

@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI System Test - Chrome Extension</title>
+    <style>
+        body { font-family: Arial, sans-serif; max-width: 800px; margin: 0 auto; padding: 20px; }
+        .test-section { margin: 20px 0; padding: 15px; border: 1px solid #ddd; border-radius: 5px; }
+        .success { background-color: #d4edda; border-color: #c3e6cb; }
+        .error { background-color: #f8d7da; border-color: #f5c6cb; }
+        button { padding: 10px 20px; margin: 5px; cursor: pointer; }
+        input, textarea { width: 100%; padding: 8px; margin: 5px 0; }
+        .output { background: #f8f9fa; padding: 10px; border-radius: 3px; margin: 10px 0; }
+        .provider { display: inline-block; margin: 2px; padding: 4px 8px; background: #e9ecef; border-radius: 3px; font-size: 12px; }
+        .provider.active { background: #28a745; color: white; }
+        .provider.failed { background: #dc3545; color: white; }
+    </style>
+</head>
+<body>
+    <h1>🧠 AI System Test</h1>
+    <p>Testing the unified AI fallback system with 6 providers.</p>
+
+    <div class="test-section">
+        <h3>📝 Test Question</h3>
+        <textarea id="questionInput" rows="3" placeholder="Enter your question here...">What is 2+2?</textarea>
+        <button id="testBtn">Test AI System</button>
+        <div id="testOutput" class="output" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>🔍 Provider Status</h3>
+        <button id="statusBtn">Check Provider Status</button>
+        <div id="statusOutput" class="output" style="display: none;"></div>
+    </div>
+
+    <div class="test-section">
+        <h3>📊 System Information</h3>
+        <div id="systemInfo" class="output">
+            <p><strong>Unified System:</strong> ✅ Active</p>
+            <p><strong>Providers:</strong> 
+                <span class="provider">Groq</span>
+                <span class="provider">FreeLLM</span>
+                <span class="provider">OpenRouter</span>
+                <span class="provider">Gemini</span>
+                <span class="provider">HuggingFace</span>
+                <span class="provider">OpenAI</span>
+            </p>
+            <p><strong>Function:</strong> solveWithFallback(question: string)</p>
+            <p><strong>Response:</strong> { answer, explanation, source, timeTaken }</p>
+            <p><strong>Timeout:</strong> 10 seconds per provider</p>
+            <p><strong>Environment:</strong> Loads from .env files</p>
+        </div>
+    </div>
+
+    <script type="module">
+        // Import the unified AI system
+        import { solveWithFallback, getAPIStatus } from './src/lib/api.js';
+
+        const questionInput = document.getElementById('questionInput');
+        const testBtn = document.getElementById('testBtn');
+        const testOutput = document.getElementById('testOutput');
+        const statusBtn = document.getElementById('statusBtn');
+        const statusOutput = document.getElementById('statusOutput');
+
+        // Test the AI system
+        testBtn.addEventListener('click', async () => {
+            const question = questionInput.value.trim();
+            if (!question) {
+                alert('Please enter a question');
+                return;
+            }
+
+            testBtn.disabled = true;
+            testBtn.textContent = 'Testing...';
+            testOutput.style.display = 'block';
+            testOutput.innerHTML = '<div>🧠 Testing AI system...</div>';
+
+            try {
+                console.log('🧠 Testing AI system...');
+                const result = await solveWithFallback(question);
+                
+                // Update provider indicators
+                const providers = ['Groq', 'FreeLLM', 'OpenRouter', 'Gemini', 'HuggingFace', 'OpenAI'];
+                const providerElements = document.querySelectorAll('.provider');
+                providerElements.forEach((el, index) => {
+                    el.className = 'provider';
+                    if (result.source === providers[index]) {
+                        el.classList.add('active');
+                    } else if (result.source !== 'none') {
+                        el.classList.add('failed');
+                    }
+                });
+                
+                testOutput.innerHTML = `
+                    <div class="success">
+                        <h4>✅ Test Successful!</h4>
+                        <p><strong>Answer:</strong> ${result.answer}</p>
+                        <p><strong>Explanation:</strong> ${result.explanation}</p>
+                        <p><strong>Source:</strong> ${result.source}</p>
+                        <p><strong>Time Taken:</strong> ${result.timeTaken}ms</p>
+                    </div>
+                `;
+                testOutput.className = 'output success';
+            } catch (error) {
+                testOutput.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Test Failed</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    </div>
+                `;
+                testOutput.className = 'output error';
+            } finally {
+                testBtn.disabled = false;
+                testBtn.textContent = 'Test AI System';
+            }
+        });
+
+        // Check provider status
+        statusBtn.addEventListener('click', () => {
+            statusOutput.style.display = 'block';
+            statusOutput.innerHTML = '<div>🔍 Checking provider status...</div>';
+
+            try {
+                const status = getAPIStatus();
+                let statusHtml = '<h4>📊 Provider Status</h4>';
+                
+                Object.entries(status).forEach(([name, info]) => {
+                    const statusIcon = info.available ? '✅' : '❌';
+                    const keyStatus = info.requiresKey ? (info.available ? 'Key Set' : 'No Key') : 'No Key Required';
+                    statusHtml += `<p>${statusIcon} <strong>${name}:</strong> ${keyStatus}</p>`;
+                });
+                
+                statusOutput.innerHTML = statusHtml;
+                statusOutput.className = 'output success';
+            } catch (error) {
+                statusOutput.innerHTML = `
+                    <div class="error">
+                        <h4>❌ Status Check Failed</h4>
+                        <p><strong>Error:</strong> ${error.message}</p>
+                    </div>
+                `;
+                statusOutput.className = 'output error';
+            }
+        });
+
+        // Auto-check status on load
+        statusBtn.click();
+    </script>
+</body>
+</html>

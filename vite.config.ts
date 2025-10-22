@@ -19,7 +19,11 @@ export default defineConfig({
       ]
     })
   ],
-  define: { 'process.env': process.env },
+  define: {
+    'process.env.VITE_OPENAI_API_KEY': JSON.stringify(process.env.VITE_OPENAI_API_KEY),
+    'process.env.VITE_GROQ_API_KEY': JSON.stringify(process.env.VITE_GROQ_API_KEY),
+    'process.env.VITE_OPENROUTER_API_KEY': JSON.stringify(process.env.VITE_OPENROUTER_API_KEY),
+  },
   build: {
     outDir: 'dist',
     rollupOptions: {
