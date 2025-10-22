@@ -15,7 +15,7 @@ export const Header: React.FC<HeaderProps> = ({ isDarkMode, onToggleDarkMode }) 
           <Brain className="h-6 w-6 text-primary" />
         </div>
         <div>
-          <h1 className="text-lg font-semibold text-foreground">AI MCQ Solver</h1>
+          <h1 className="text-lg font-semibold text-foreground">QuizzKar</h1>
           <p className="text-xs text-muted-foreground">Solve questions instantly</p>
         </div>
       </div>

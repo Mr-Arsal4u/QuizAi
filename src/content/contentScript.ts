@@ -23,7 +23,7 @@ function debugChromeAPIs(context: string) {
 }
 
 // Initial logging when content script loads
-console.log('🚀 AI MCQ Solver Content Script loaded');
+console.log('🚀 QuizzKar Content Script loaded');
 debugChromeAPIs('Content Script Initial Load');
 
 // Function to check if extension context is still valid

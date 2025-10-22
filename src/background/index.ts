@@ -2,12 +2,12 @@
 // Check if Chrome APIs are available
 if (typeof chrome !== 'undefined' && chrome.runtime) {
   chrome.runtime.onInstalled.addListener(() => {
-    console.log('AI MCQ Solver extension installed');
+    console.log('QuizzKar extension installed');
     
     // Create context menu
     chrome.contextMenus.create({
       id: 'ask-quizai',
-      title: 'Ask QuizAi',
+      title: 'Ask QuizzKar',
       contexts: ['selection'],
       documentUrlPatterns: ['<all_urls>']
     });

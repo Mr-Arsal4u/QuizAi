@@ -273,7 +273,7 @@ const App: React.FC = () => {
             <CardContent className="p-4 text-center">
               <div className="space-y-2">
                 <div className="text-4xl">🧠</div>
-                <h3 className="font-medium text-foreground">AI MCQ Solver</h3>
+                <h3 className="font-medium text-foreground">QuizzKar</h3>
                 <p className="text-sm text-muted-foreground">
                   {isChromeExtension 
                     ? "Select text on any webpage or paste your question above to get instant AI-powered solutions."
