@@ -35,3 +35,5 @@ VITE_OPENAI_API_KEY=your_openai_api_key_here
 - **HuggingFace**: https://huggingface.co/settings/tokens
 - **OpenAI**: https://platform.openai.com/api-keys
 - **FreeLLM**: No key required
+
+

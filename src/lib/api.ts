@@ -326,15 +326,15 @@ async function tryOpenAI(question: string): Promise<AIResponse | null> {
 
 /**
  * Main function to solve questions with automatic fallback
- * Tries providers in order: FreeLLM → GROQ → OpenRouter → Gemini → HuggingFace → OpenAI
+ * Tries providers in order: GROQ → FreeLLM → OpenRouter → Gemini → HuggingFace → OpenAI
  */
 export async function solveWithFallback(question: string): Promise<AIResponse> {
   console.log('🧠 Starting AI fallback system...');
   console.log('📝 Question:', question);
 
   const providers = [
-    tryFreeLLM,
     tryGroq,
+    tryFreeLLM,
     tryOpenRouter,
     tryGemini,
     tryHuggingFace,
