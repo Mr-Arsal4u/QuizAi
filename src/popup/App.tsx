@@ -6,7 +6,7 @@ import { Button } from '../components/ui/button'
 import { Textarea } from '../components/ui/textarea'
 import { Card, CardContent } from '../components/ui/card'
 import { solveWithFallback, AIResponse } from '../lib/api'
-import { Send, Copy, Check } from 'lucide-react'
+import { Send, Copy, Check, Loader2, AlertTriangle } from 'lucide-react'
 
 const App: React.FC = () => {
   const [question, setQuestion] = useState('')
@@ -24,7 +24,7 @@ const App: React.FC = () => {
     if (contextInvalidated) {
       return false;
     }
-    
+
     try {
       if (typeof chrome === 'undefined' || !chrome.runtime || !chrome.runtime.id) {
         setContextInvalidated(true);
@@ -48,7 +48,7 @@ const App: React.FC = () => {
       console.log('Chrome storage not available or context invalidated');
       return;
     }
-    
+
     chrome.storage.local.get(keys, (result) => {
       if (chrome.runtime.lastError) {
         console.log('Extension context invalidated during storage get');
@@ -65,7 +65,7 @@ const App: React.FC = () => {
       console.log('Chrome storage not available or context invalidated');
       return;
     }
-    
+
     chrome.storage.local.set(items, () => {
       if (chrome.runtime.lastError) {
         console.log('Extension context invalidated during storage set');
@@ -110,7 +110,7 @@ const App: React.FC = () => {
   // Listen for messages from content script
   useEffect(() => {
     if (!isChromeExtension || !isContextValid()) return;
-    
+
     const handleMessage = (message: any) => {
       if (chrome.runtime.lastError) {
         console.log('Extension context invalidated during message handling');
@@ -133,7 +133,7 @@ const App: React.FC = () => {
       if (namespace === 'local' && changes.selectedText) {
         const newText = changes.selectedText.newValue;
         const timestamp = changes.timestamp?.newValue;
-        
+
         if (newText && timestamp) {
           // Only use text if it's recent (within last 30 seconds)
           const isRecent = Date.now() - timestamp < 30000;
@@ -193,7 +193,7 @@ const App: React.FC = () => {
   return (
     <div className="w-full min-h-[500px] bg-background">
       <Header isDarkMode={isDarkMode} onToggleDarkMode={handleToggleDarkMode} />
-      
+
       <div className="p-4 space-y-4">
         <Card>
           <CardContent className="p-4">
@@ -209,15 +209,19 @@ const App: React.FC = () => {
                   className="min-h-[100px] resize-none"
                 />
               </div>
-              
+
               <div className="flex space-x-2">
-                <Button 
-                  onClick={handleSolve} 
+                <Button
+                  onClick={handleSolve}
                   disabled={!question.trim() || isLoading}
-                  className="flex-1"
+                  className={`flex-1 transition-all duration-300 ${isLoading ? 'opacity-90 cursor-wait' : ''
+                    }`}
                 >
                   {isLoading ? (
-                    <Loader size="sm" text="" />
+                    <div className="flex items-center justify-center space-x-2">
+                      <Loader2 className="h-4 w-4 animate-spin text-current" />
+                      <span className="font-medium">Solving with AI...</span>
+                    </div>
                   ) : (
                     <>
                       <Send className="h-4 w-4 mr-2" />
@@ -225,10 +229,10 @@ const App: React.FC = () => {
                     </>
                   )}
                 </Button>
-                
+
                 {response && (
-                  <Button 
-                    variant="outline" 
+                  <Button
+                    variant="outline"
                     size="icon"
                     onClick={handleCopy}
                     title="Copy answer"
@@ -241,11 +245,11 @@ const App: React.FC = () => {
                   </Button>
                 )}
               </div>
-              
+
               {question && (
-                <Button 
-                  variant="ghost" 
-                  size="sm" 
+                <Button
+                  variant="ghost"
+                  size="sm"
                   onClick={handleClear}
                   className="w-full"
                 >
@@ -275,7 +279,7 @@ const App: React.FC = () => {
                 <div className="text-4xl">🧠</div>
                 <h3 className="font-medium text-foreground">QuizzKar</h3>
                 <p className="text-sm text-muted-foreground">
-                  {isChromeExtension 
+                  {isChromeExtension
                     ? "Select text on any webpage or paste your question above to get instant AI-powered solutions."
                     : "Paste your question above to get instant AI-powered solutions."
                   }
@@ -289,6 +293,16 @@ const App: React.FC = () => {
             </CardContent>
           </Card>
         )}
+
+        {/* Disclaimer */}
+        <div className="pt-2 pb-2">
+          <div className="flex items-start space-x-2 p-3 bg-yellow-50 dark:bg-yellow-900/20 border border-yellow-200 dark:border-yellow-800/30 rounded-lg">
+            <AlertTriangle className="h-4 w-4 text-yellow-600 dark:text-yellow-500 mt-0.5 flex-shrink-0" />
+            <p className="text-xs text-yellow-800 dark:text-yellow-200 leading-relaxed">
+              <span className="font-semibold">Disclaimer:</span> AI can assist in providing answers and guidance, but we encourage independent verification to ensure accuracy.
+            </p>
+          </div>
+        </div>
       </div>
     </div>
   )
