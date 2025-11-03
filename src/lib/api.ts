@@ -91,14 +91,12 @@ async function tryGroq(question: string): Promise<AIResponse | null> {
       timeTaken: Date.now() - startTime
     };
   } catch (error) {
-    console.warn('Groq failed:', error);
     return null;
   }
 }
 
 // FreeLLM API
 async function tryFreeLLM(question: string): Promise<AIResponse | null> {
-  console.log('🚀 Trying FreeLLM...');
   const startTime = Date.now();
   
   try {
@@ -113,8 +111,6 @@ async function tryFreeLLM(question: string): Promise<AIResponse | null> {
     }), 10000);
 
     if (!response.ok) {
-      const errorText = await response.text();
-      console.warn(`FreeLLM failed: HTTP ${response.status} - ${errorText}`);
       return null;
     }
     
@@ -136,8 +132,6 @@ async function tryFreeLLM(question: string): Promise<AIResponse | null> {
     
     const timeTaken = Date.now() - startTime;
     
-    console.log(`✅ FreeLLM responded in ${timeTaken}ms`);
-    
     return {
       answer: content.trim(),
       explanation: 'No additional explanation provided.',
@@ -145,7 +139,6 @@ async function tryFreeLLM(question: string): Promise<AIResponse | null> {
       timeTaken
     };
   } catch (error) {
-    console.warn('FreeLLM failed:', error);
     return null;
   }
 }
@@ -190,7 +183,6 @@ async function tryOpenRouter(question: string): Promise<AIResponse | null> {
       timeTaken: Date.now() - startTime
     };
   } catch (error) {
-    console.warn('OpenRouter failed:', error);
     return null;
   }
 }
@@ -234,7 +226,6 @@ async function tryGemini(question: string): Promise<AIResponse | null> {
       timeTaken: Date.now() - startTime
     };
   } catch (error) {
-    console.warn('Gemini failed:', error);
     return null;
   }
 }
@@ -276,7 +267,6 @@ async function tryHuggingFace(question: string): Promise<AIResponse | null> {
       timeTaken: Date.now() - startTime
     };
   } catch (error) {
-    console.warn('HuggingFace failed:', error);
     return null;
   }
 }
@@ -319,7 +309,6 @@ async function tryOpenAI(question: string): Promise<AIResponse | null> {
       timeTaken: Date.now() - startTime
     };
   } catch (error) {
-    console.warn('OpenAI failed:', error);
     return null;
   }
 }
@@ -329,9 +318,6 @@ async function tryOpenAI(question: string): Promise<AIResponse | null> {
  * Tries providers in order: GROQ → FreeLLM → OpenRouter → Gemini → HuggingFace → OpenAI
  */
 export async function solveWithFallback(question: string): Promise<AIResponse> {
-  console.log('🧠 Starting AI fallback system...');
-  console.log('📝 Question:', question);
-
   const providers = [
     tryGroq,
     tryFreeLLM,
@@ -343,20 +329,17 @@ export async function solveWithFallback(question: string): Promise<AIResponse> {
 
   for (const provider of providers) {
     try {
-      console.log(`🚀 Trying ${provider.name}...`);
       const response = await provider(question);
       
       if (response?.answer) {
-        console.log(`✅ ${response.source} responded successfully in ${response.timeTaken}ms`);
         return response;
       }
     } catch (error) {
-      console.warn(`❌ ${provider.name} failed:`, error);
+      // Continue to next provider
     }
   }
 
   // All providers failed
-  console.error('💥 All AI providers failed');
   return {
     answer: "Sorry, I couldn't generate a response right now.",
     explanation: "All AI providers are currently unavailable.",

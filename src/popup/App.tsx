@@ -45,13 +45,11 @@ const App: React.FC = () => {
   // Function to safely use Chrome storage
   const safeStorageGet = (keys: string | string[], callback: (result: { [key: string]: any }) => void) => {
     if (!isChromeExtension || contextInvalidated || !isContextValid()) {
-      console.log('Chrome storage not available or context invalidated');
       return;
     }
 
     chrome.storage.local.get(keys, (result) => {
       if (chrome.runtime.lastError) {
-        console.log('Extension context invalidated during storage get');
         setContextInvalidated(true);
         return;
       }
@@ -62,13 +60,11 @@ const App: React.FC = () => {
   // Function to safely use Chrome storage set
   const safeStorageSet = (items: { [key: string]: any }, callback?: () => void) => {
     if (!isChromeExtension || contextInvalidated || !isContextValid()) {
-      console.log('Chrome storage not available or context invalidated');
       return;
     }
 
     chrome.storage.local.set(items, () => {
       if (chrome.runtime.lastError) {
-        console.log('Extension context invalidated during storage set');
         setContextInvalidated(true);
         return;
       }
@@ -113,7 +109,6 @@ const App: React.FC = () => {
 
     const handleMessage = (message: any) => {
       if (chrome.runtime.lastError) {
-        console.log('Extension context invalidated during message handling');
         return;
       }
       if (message.action === 'selectedText' && message.text) {
@@ -164,7 +159,6 @@ const App: React.FC = () => {
       const result = await solveWithFallback(question)
       setResponse(result)
     } catch (error) {
-      console.error('Error solving question:', error)
       setResponse({
         answer: 'Sorry, there was an error processing your question. Please try again.',
         explanation: 'The AI service is currently unavailable. Please check your connection and try again.',
