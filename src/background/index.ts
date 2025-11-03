@@ -2,7 +2,7 @@
 // Check if Chrome APIs are available
 if (typeof chrome !== 'undefined' && chrome.runtime) {
   chrome.runtime.onInstalled.addListener(() => {
-    // Create context menu
+    // Create context menu - only on vulms domains
     chrome.contextMenus.create({
       id: 'ask-quizai',
       title: 'Ask QuizzKar',
@@ -11,12 +11,29 @@ if (typeof chrome !== 'undefined' && chrome.runtime) {
     });
   });
 
+  // Helper function to check if URL is a vulms domain
+  function isVulmsDomain(url?: string): boolean {
+    if (!url) return false;
+    try {
+      const hostname = new URL(url).hostname.toLowerCase();
+      return hostname.includes('vulms');
+    } catch {
+      return false;
+    }
+  }
+
   // Handle messages between content script and popup
   chrome.runtime.onMessage.addListener((request: any, sender: chrome.runtime.MessageSender, sendResponse: (response?: any) => void) => {
     // Check for context invalidation
     if (chrome.runtime.lastError) {
       sendResponse({ error: 'Extension context invalidated' });
       return;
+    }
+
+    // Only process messages from vulms domains
+    const senderUrl = sender.tab?.url || sender.url;
+    if (!isVulmsDomain(senderUrl)) {
+      return; // Silently ignore messages from non-vulms domains
     }
   
   if (request.action === 'selectedText') {
@@ -101,6 +118,11 @@ if (typeof chrome !== 'undefined' && chrome.runtime) {
 
   // Handle context menu clicks
   chrome.contextMenus.onClicked.addListener((info, tab) => {
+    // Only process clicks on vulms domains
+    if (!isVulmsDomain(tab?.url)) {
+      return;
+    }
+
     if (info.menuItemId === 'ask-quizai' && info.selectionText) {
       // Store the selected text and open popup
       chrome.storage.local.set({

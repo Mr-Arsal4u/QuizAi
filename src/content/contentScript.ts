@@ -5,6 +5,19 @@ let contextInvalidated = false; // Global flag to track context state
 // Check if Chrome APIs are available and context is valid
 const isChromeExtension = typeof chrome !== 'undefined' && chrome.runtime && chrome.runtime.sendMessage;
 
+// Check if current domain contains "vulms" keyword
+function isVulmsDomain(): boolean {
+  const hostname = window.location.hostname.toLowerCase();
+  return hostname.includes('vulms');
+}
+
+// Only proceed if on a vulms domain - wrap everything in this check
+(function initExtension() {
+  if (!isVulmsDomain()) {
+    // Exit early if not a vulms domain - extension will not run
+    return;
+  }
+
 // ============================================
 // Forcefully enable right-click context menu
 // ============================================
@@ -509,3 +522,5 @@ document.addEventListener('contextmenu', () => {
     }
   }
 });
+
+})(); // Close initExtension - all code above only runs on vulms domains
