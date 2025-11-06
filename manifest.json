@@ -16,15 +16,25 @@
       "128": "icons/icon128.png"
     }
   },
-  "permissions": ["storage", "activeTab", "scripting", "contextMenus"],
-  "host_permissions": ["<all_urls>"],
-  "background": { 
-    "service_worker": "background.js" 
+  "permissions": [
+    "storage",
+    "activeTab",
+    "contextMenus"
+  ],
+  "host_permissions": [
+    "<all_urls>"
+  ],
+  "background": {
+    "service_worker": "background.js"
   },
   "content_scripts": [
     {
-      "matches": ["<all_urls>"],
-      "js": ["contentScript.js"],
+      "matches": [
+        "<all_urls>"
+      ],
+      "js": [
+        "contentScript.js"
+      ],
       "run_at": "document_end"
     }
   ]
